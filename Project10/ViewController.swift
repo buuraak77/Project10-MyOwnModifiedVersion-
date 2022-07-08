@@ -15,6 +15,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
         super.viewDidLoad()
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewPerson))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refreshTapped))
         
     }
     
@@ -73,7 +74,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let person = people[indexPath.item]
         
-        let alert = UIAlertController(title: "Rename Person", message: nil, preferredStyle: .alert)
+        let alert = UIAlertController(title: "Edit Person", message: nil, preferredStyle: .alert)
         alert.addTextField()
         
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self, weak alert]_ in
@@ -82,12 +83,30 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
             self?.collectionView.reloadData()
         }))
         
-        alert.addAction(UIAlertAction(title: "Delete", style: .cancel, handler: { [weak self, weak alert]_ in
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self, weak alert]_ in
             self?.people.remove(at: indexPath.row)
             self?.collectionView.reloadData()
         }))
         
+        alert.addAction(UIAlertAction(title: "Share", style: .default, handler: { [weak self, weak alert]_ in
+            guard let nameItem = alert?.textFields![0].text else {return}
+            let ac = UIActivityViewController(activityItems: self!.people, applicationActivities: nil)
+            self!.present(ac, animated: true)
+        }))
+        
+        
         present(alert, animated: true)
+    }
+    
+    @objc func shareTapped() {
+        
+        let ac = UIActivityViewController(activityItems: self.people, applicationActivities: nil)
+        present(ac, animated: true)
+    }
+    
+    @objc func refreshTapped() {
+        self.people.removeAll()
+        collectionView.reloadData()
     }
 
 
